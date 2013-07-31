@@ -16,30 +16,33 @@ class Stylesheet{
         $length     = strlen($this->stylesheet);
         $tokens     = array();
         $selector   = "";
-        $property = "";
+        $property   = "";
         $isSelector = true;
-        $string = "";
+        $string     = "";
         for($i = 0; $i < $length; $i++){
             $ch = $this->stylesheet[$i];
             switch($ch){
                 case "{":
-                    $selector = $string;
-                    $string = "";
+                    $selector          = trim($string);
+                    $string            = "";
                     $tokens[$selector] = array();
-                    $isSelector = false;
+                    $isSelector        = false;
                     break;
                 case ":":
-                    $property = trim($string);
-                    $string = "";
-                    $tokens[$selector][$property] = "";
+                    if(!$isSelector){
+                        $property                     = trim($string);
+                        $string                       = "";
+                        $tokens[$selector][$property] = "";
+                    }
                     break;
                 case ";":
                     $tokens[$selector][$property] = trim($string);
-                    $string = "";
+                    $string                       = "";
                     break;
                 case "}":
-                    $selector = "";
-                    $string = "";
+                    $selector                     = "";
+                    $string                       = "";
+                    $isSelector                   = true;
                     break;
                 default:
                     $string .= $ch;
