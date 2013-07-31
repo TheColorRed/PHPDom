@@ -13,63 +13,71 @@ class Stylesheet{
 
     public function parse(){
         $this->cleanup();
-        $length        = strlen($this->stylesheet);
-        $tokens        = array();
-        $selector      = "";
-        $subSelector   = "";
-        $property      = "";
-        $isSelector    = true;
-        $isSubSelector = false;
-        $isMedia       = false;
-        $string        = "";
-        $lastChar      = "";
+        $length      = strlen($this->stylesheet);
+        $tokens      = array();
+        $isMedia     = false;
+        $depth       = 0;
+        $lastChar    = "";
+        $property    = "";
+        $subproperty = "";
+        $string      = "";
+        $selector    = "";
+        $subselector = "";
         for($i = 0; $i < $length; $i++){
-            $ch = $this->stylesheet[$i];
-            switch($ch){
+            $char = $this->stylesheet[$i];
+            switch($char){
                 case "@":
                     if(substr($this->stylesheet, $i, 6) == "@media"){
-                        $isMedia       = true;
-                        $isSubSelector = true;
+                        $isMedia = true;
                         $string .= "@";
                     }
                     break;
                 case "{":
-                    if($isSubSelector){
-                        $subSelector                     = trim($string);
-                        $string                          = "";
-                        $tokens[$selector][$subSelector] = array();
-                    }else{
+                    $depth++;
+                    if($depth == 1){
                         $selector          = trim($string);
-                        $string            = "";
                         $tokens[$selector] = array();
                     }
-                        $isSelector        = false;
+                    if($depth == 2){
+                        $subselector                     = trim($string);
+                        $tokens[$selector][$subselector] = array();
+                    }
+                    $string = "";
                     break;
                 case ":":
-                    if(!$isSelector){
-                        $property = trim($string);
-                        if($isSubSelector){
-                            $tokens[$selector][$subSelector][$property] = "";
-                        }else{
-                            $string                       = "";
-                            $tokens[$selector][$property] = "";
-                        }
+                    if($depth === 1 && !$isMedia){
+                        $property                     = trim($string);
+                        $string                       = "";
+                        $tokens[$selector][$property] = "";
+                    }elseif($depth === 2){
+                        $subproperty                                   = trim($string);
+                        $string                                        = "";
+                        $tokens[$selector][$subselector][$subproperty] = "";
+                    }else{
+                        $string .= ":";
                     }
                     break;
                 case ";":
-                    $tokens[$selector][$property] = trim($string);
-                    $string                       = "";
+                    if($depth === 1){
+                        $tokens[$selector][$property] = trim($string);
+                        $string                       = "";
+                    }
+                    if($depth == 2){
+                        $tokens[$selector][$subselector][$subproperty] = trim($string);
+                        $string                                        = "";
+                    }
                     break;
                 case "}":
-                    $selector                     = "";
-                    $string                       = "";
-                    $isSelector                   = true;
+                    $depth--;
+                    if($depth == 0 && $isMedia){
+                        $isMedia = false;
+                    }
                     break;
                 default:
-                    $string .= $ch;
+                    $string .= $char;
                     break;
             }
-            $lastChar = $ch;
+            $lastChar = $char;
         }
         print_r($tokens);
         $this->markup = $tokens;
@@ -78,11 +86,11 @@ class Stylesheet{
 
     protected function cleanup(){
         $sheet            = $this->stylesheet;
-        // Remove Comments
+// Remove Comments
         $sheet            = preg_replace("/\/\*.+\*\//isU", "", $sheet);
-        // Remove Tabs, New Lines, and Carriage Returns
+// Remove Tabs, New Lines, and Carriage Returns
         $sheet            = preg_replace("/\t|\r|\n/", "", $sheet);
-        //echo $sheet."\n\n\n\n\n\n\n";
+//echo $sheet."\n\n\n\n\n\n\n";
         $this->stylesheet = $sheet;
         unset($sheet);
     }
