@@ -9,7 +9,7 @@ class PHPDom{
     protected $url         = "";
     protected $html        = "";
     protected $httpCode    = "";
-    protected $stylesheets = array("links"  => array(), "markup" => array());
+    protected $stylesheets = array("url" => array(), "css" => array());
 
     /**
      * Loads a web pages html and css
@@ -32,12 +32,12 @@ class PHPDom{
         $matches = array();
         preg_match_all("/<link.+href.+[\"'](.+\.css)[\"'].+>/isU", $this->html, $matches);
         foreach($matches[1] as $url){
-            $this->stylesheets["links"][$url] = URL::rel2abs($url, $this->url);
+            $this->stylesheets["url"][$url] = URL::rel2abs($url, $this->url);
         }
-        $url         = new URL($this->stylesheets["links"]);
+        $url         = new URL($this->stylesheets["url"]);
         $stylesheets = $url->go();
         foreach($stylesheets as $markup){
-            $this->stylesheets["markup"][$markup["url"]] = (new Stylesheet())->loadStylesheet($markup["data"]);
+            $this->stylesheets["css"][$markup["url"]] = (new Stylesheet())->loadStylesheet($markup["data"]);
         }
     }
 
