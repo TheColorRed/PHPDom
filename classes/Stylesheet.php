@@ -13,26 +13,47 @@ class Stylesheet{
 
     public function parse(){
         $this->cleanup();
-        $length     = strlen($this->stylesheet);
-        $tokens     = array();
-        $selector   = "";
-        $property   = "";
-        $isSelector = true;
-        $string     = "";
+        $length        = strlen($this->stylesheet);
+        $tokens        = array();
+        $selector      = "";
+        $subSelector   = "";
+        $property      = "";
+        $isSelector    = true;
+        $isSubSelector = false;
+        $isMedia       = false;
+        $string        = "";
+        $lastChar      = "";
         for($i = 0; $i < $length; $i++){
             $ch = $this->stylesheet[$i];
             switch($ch){
+                case "@":
+                    if(substr($this->stylesheet, $i, 6) == "@media"){
+                        $isMedia       = true;
+                        $isSubSelector = true;
+                        $string .= "@";
+                    }
+                    break;
                 case "{":
-                    $selector          = trim($string);
-                    $string            = "";
-                    $tokens[$selector] = array();
-                    $isSelector        = false;
+                    if($isSubSelector){
+                        $subSelector                     = trim($string);
+                        $string                          = "";
+                        $tokens[$selector][$subSelector] = array();
+                    }else{
+                        $selector          = trim($string);
+                        $string            = "";
+                        $tokens[$selector] = array();
+                    }
+                        $isSelector        = false;
                     break;
                 case ":":
                     if(!$isSelector){
-                        $property                     = trim($string);
-                        $string                       = "";
-                        $tokens[$selector][$property] = "";
+                        $property = trim($string);
+                        if($isSubSelector){
+                            $tokens[$selector][$subSelector][$property] = "";
+                        }else{
+                            $string                       = "";
+                            $tokens[$selector][$property] = "";
+                        }
                     }
                     break;
                 case ";":
@@ -48,7 +69,9 @@ class Stylesheet{
                     $string .= $ch;
                     break;
             }
+            $lastChar = $ch;
         }
+        print_r($tokens);
         $this->markup = $tokens;
         unset($tokens);
     }
