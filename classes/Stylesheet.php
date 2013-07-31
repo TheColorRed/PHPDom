@@ -7,13 +7,22 @@ class Stylesheet{
 
     public function loadStylesheet($string){
         $this->stylesheet = $string;
-        $this->parse();
+        return $this;
+    }
+    
+    public function getMarkup(){
+        if(empty($this->markup)){
+            $this->parse();
+        }
         return $this->markup;
     }
 
-    public function parse(){
+    protected function parse(){
         $this->cleanup();
         $length      = strlen($this->stylesheet);
+        if($length == 0){
+            return false;
+        }
         $tokens      = array();
         $isMedia     = false;
         $depth       = 0;
@@ -79,7 +88,6 @@ class Stylesheet{
             }
             $lastChar = $char;
         }
-        print_r($tokens);
         $this->markup = $tokens;
         unset($tokens);
     }

@@ -18,16 +18,17 @@ class URL{
     }
 
     protected function getURL($other_params = array()){
-        $html = "";
-        $url  = $this->url;
+        $html     = "";
+        $url      = $this->url;
+        $finalURL = "";
         if(is_array($url)){
             return $this->getURLs($other_params);
         }
         try{
-            $ch   = $this->curlInit($url, $other_params);
-            $html = curl_exec($ch);
-            $info = (object)curl_getinfo($ch);
-
+            $ch             = $this->curlInit($url, $other_params);
+            $html           = curl_exec($ch);
+            $info           = (object)curl_getinfo($ch);
+            $finalURL       = $info->url;
             $this->httpCode = $info->http_code;
         }catch(Exception $e){
             try{
@@ -38,7 +39,7 @@ class URL{
                 throw $e;
             }
         }
-        return $html;
+        return array("url"  => $finalURL, "data" => $html);
     }
 
     protected function getURLs($other_params = array()){
@@ -49,7 +50,7 @@ class URL{
         }
         $mh = curl_multi_init();
         foreach($url as $u){
-            $url_list[] = $handle = $this->curlInit($u, $other_params);
+            $url_list[] = $handle     = $this->curlInit($u, $other_params);
             curl_multi_add_handle($mh, $handle);
         }
         $active = null;
@@ -67,7 +68,11 @@ class URL{
         }
         $data = array();
         foreach($url_list as $handle){
-            $data[] = curl_multi_getcontent($handle);
+            $info   = (object)curl_getinfo($handle);
+            $data[] = array(
+                "url"  => $info->url,
+                "data" => curl_multi_getcontent($handle)
+            );
             curl_multi_remove_handle($mh, $handle);
         }
         curl_multi_close($mh);

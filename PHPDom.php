@@ -20,7 +20,7 @@ class PHPDom{
     public function loadURL($url, $other_params = array()){
         $this->url  = $url;
         $u          = new URL($url);
-        $this->html = $u->go($other_params);
+        $this->html = $u->go($other_params)["data"];
         $this->loadStylesheets();
     }
 
@@ -32,13 +32,12 @@ class PHPDom{
         $matches = array();
         preg_match_all("/<link.+href.+[\"'](.+\.css)[\"'].+>/isU", $this->html, $matches);
         foreach($matches[1] as $url){
-            $this->stylesheets["links"][] = URL::rel2abs($url, $this->url);
+            $this->stylesheets["links"][$url] = URL::rel2abs($url, $this->url);
         }
         $url         = new URL($this->stylesheets["links"]);
         $stylesheets = $url->go();
         foreach($stylesheets as $markup){
-            $stylesheet                    = new Stylesheet();
-            $this->stylesheets["markup"][] = $stylesheet->loadStylesheet($markup);
+            $this->stylesheets["markup"][$markup["url"]] = (new Stylesheet())->loadStylesheet($markup["data"]);
         }
     }
 
