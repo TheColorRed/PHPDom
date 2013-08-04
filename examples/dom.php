@@ -1,6 +1,6 @@
 <form action="" method="get">
     <p>
-        <input type="text" name="url" placeholder="Webpage URL" />
+        <input type="text" name="url" placeholder="Webpage URL" value="<?php echo (isset($_GET["url"]) ? $_GET["url"] : ""); ?>" />
         <input type="submit" name="search" value="Parse Me!" />
     </p>
 </form>
