@@ -21,10 +21,10 @@ $dom->loadURL($url);
 
 if($dom->getHttpCode() == 200){
     $stylesheets = $dom->getStyleSheets();
-    foreach($stylesheets as $sheet){
-        echo "<h2>{$sheet["url"]}</h2>";
+    foreach($stylesheets["css"] as $url => $sheet){
+        echo "<h2>{$url}</h2>";
         echo "<pre>";
-        echo print_r($sheet["css"]);
+        print_r($sheet->getMarkup());
         echo "</pre>";
     }
 }
