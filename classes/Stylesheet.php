@@ -27,6 +27,7 @@ class Stylesheet{
         $isMedia     = false;
         $depth       = 0;
         $lastChar    = "";
+        $lastkeyChar = "";
         $property    = "";
         $subproperty = "";
         $string      = "";
@@ -40,6 +41,7 @@ class Stylesheet{
                         $isMedia = true;
                         $string .= "@";
                     }
+                    $lastkeyChar = $char;
                     break;
                 case "{":
                     $depth++;
@@ -52,19 +54,21 @@ class Stylesheet{
                         $tokens[$selector][$subselector] = array();
                     }
                     $string = "";
+                    $lastkeyChar = $char;
                     break;
                 case ":":
-                    if($depth === 1 && !$isMedia){
+                    if($depth === 1 && !$isMedia && $lastkeyChar != $char){
                         $property                     = trim($string);
                         $string                       = "";
                         $tokens[$selector][$property] = "";
-                    }elseif($depth === 2){
+                    }elseif($depth === 2 && $lastkeyChar != $char){
                         $subproperty                                   = trim($string);
                         $string                                        = "";
                         $tokens[$selector][$subselector][$subproperty] = "";
                     }else{
                         $string .= ":";
                     }
+                    $lastkeyChar = $char;
                     break;
                 case ";":
                     if($depth === 1){
@@ -75,12 +79,14 @@ class Stylesheet{
                         $tokens[$selector][$subselector][$subproperty] = trim($string);
                         $string                                        = "";
                     }
+                    $lastkeyChar = $char;
                     break;
                 case "}":
                     $depth--;
                     if($depth == 0 && $isMedia){
                         $isMedia = false;
                     }
+                    $lastkeyChar = $char;
                     break;
                 default:
                     $string .= $char;
