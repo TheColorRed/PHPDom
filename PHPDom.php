@@ -21,6 +21,7 @@ class PHPDom{
         $this->url  = $url;
         $u          = new URL($url);
         $this->html = $u->go($other_params)["data"];
+        $this->httpCode = $u->getHttpCode();
         $this->loadStylesheets();
     }
 
