@@ -40,5 +40,9 @@ class PHPDom{
             $this->stylesheets["css"][$markup["url"]] = (new Stylesheet())->loadStylesheet($markup["data"]);
         }
     }
+    
+    public function getStyleSheets(){
+        return $this->stylesheets;
+    }
 
 }
