@@ -11,10 +11,13 @@ if(!isset($_GET["search"])){
 }
 require_once __DIR__ . "/../PHPDom.php";
 
-$url = $_GET["url"];
-if(preg_match("/^http:\/\//", $url)){
+$url = urldecode($_GET["url"]);
+if(!preg_match("/^http:\/\//", $url)){
     $url = "http://$url";
 }
+
+echo "<h2>$url</h2>";
+
 $dom = new PHPDom();
 
 $dom->loadURL($url);
