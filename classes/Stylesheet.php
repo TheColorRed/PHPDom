@@ -9,7 +9,7 @@ class Stylesheet{
         $this->stylesheet = $string;
         return $this;
     }
-    
+
     public function getMarkup(){
         if(empty($this->markup)){
             $this->parse();
@@ -19,7 +19,7 @@ class Stylesheet{
 
     protected function parse(){
         $this->cleanup();
-        $length      = strlen($this->stylesheet);
+        $length = strlen($this->stylesheet);
         if($length == 0){
             return false;
         }
@@ -53,7 +53,7 @@ class Stylesheet{
                         $subselector                     = trim($string);
                         $tokens[$selector][$subselector] = array();
                     }
-                    $string = "";
+                    $string      = "";
                     $lastkeyChar = $char;
                     break;
                 case ":":
@@ -83,6 +83,10 @@ class Stylesheet{
                     break;
                 case "}":
                     $depth--;
+                    if(strlen($string) > 0){
+                        $tokens[$selector][$property] = trim($string);
+                        $string                       = "";
+                    }
                     if($depth == 0 && $isMedia){
                         $isMedia = false;
                     }
