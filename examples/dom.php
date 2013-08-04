@@ -24,7 +24,7 @@ if($dom->getHttpCode() == 200){
     foreach($stylesheets as $sheet){
         echo "<h2>{$sheet["url"]}</h2>";
         echo "<pre>";
-        echo $sheet["css"];
+        echo print_r($sheet["css"]);
         echo "</pre>";
     }
 }
