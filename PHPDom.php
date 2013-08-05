@@ -30,17 +30,20 @@ class PHPDom{
     }
 
     protected function loadStylesheets(){
-        $matches = array();
-        preg_match_all("/<link.+(href.+[\"'](.+\.css)[\"']|rel.+[\"']stylesheet[\"']).+>/isU", $this->html, $matches);
-        print_r($matches);
-        foreach($matches[1] as $url){
+        $dom = new DOMObject($this->html);
+
+        //$matches = array();
+        //|rel.+=[\"']stylesheet[\"']
+        //preg_match_all("/<link.+href.+[\"'](.+\.css)[\"'].+>/isU", $this->html, $matches);
+        //print_r($matches);
+        /*foreach($matches[1] as $url){
             $this->stylesheets["url"][$url] = URL::rel2abs($url, $this->url);
         }
         $url         = new URL($this->stylesheets["url"]);
         $stylesheets = $url->go();
         foreach($stylesheets as $markup){
             $this->stylesheets["css"][$markup["url"]] = (new Stylesheet())->loadStylesheet($markup["data"]);
-        }
+        }*/
     }
     
     public function getStyleSheets(){
