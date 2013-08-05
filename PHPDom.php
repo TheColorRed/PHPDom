@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/classes/URL.php";
 require_once __DIR__ . "/classes/Stylesheet.php";
+require_once __DIR__ . "/classes/DOMObject.php";
 
 class PHPDom{
 
